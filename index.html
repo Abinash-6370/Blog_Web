@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inkwell — Modern Blog</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500&family=DM+Mono&display=swap" rel="stylesheet" />
+</head>
+<body class="dark">
+
+  <!-- ── Toast Container ───────────────────────────────────────── -->
+  <div id="toast-container" aria-live="polite"></div>
+
+  <!-- ── Confirm Dialog ────────────────────────────────────────── -->
+  <div id="confirm-overlay" class="hidden" role="dialog" aria-modal="true">
+    <div class="confirm-box">
+      <p id="confirm-message">Are you sure?</p>
+      <div class="confirm-actions">
+        <button id="confirm-cancel" class="btn btn-ghost">Cancel</button>
+        <button id="confirm-ok"     class="btn btn-danger">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Edit Modal ─────────────────────────────────────────────── -->
+  <div id="edit-modal" class="hidden modal-overlay" role="dialog" aria-modal="true" aria-labelledby="edit-modal-title">
+    <div class="modal-box">
+      <button class="modal-close" id="edit-modal-close" aria-label="Close">✕</button>
+      <h2 id="edit-modal-title">Edit Post</h2>
+      <input  id="edit-title"   class="field" type="text"     placeholder="Post title…"   />
+      <input  id="edit-author"  class="field" type="text"     placeholder="Author name…"  />
+      <input  id="edit-tags"    class="field" type="text"     placeholder="Tags (comma-separated)…" />
+      <textarea id="edit-content" class="field" rows="6"      placeholder="Write your story…"></textarea>
+      <button id="edit-save-btn" class="btn btn-primary">Save Changes</button>
+    </div>
+  </div>
+
+  <!-- ── Header ─────────────────────────────────────────────────── -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon">✦</span>
+        <span class="logo-text">Inkwell</span>
+      </div>
+
+      <nav class="header-actions">
+        <button id="theme-toggle" class="icon-btn" aria-label="Toggle theme" title="Toggle theme">
+          <span class="theme-icon">☀︎</span>
+        </button>
+        <button id="open-compose" class="btn btn-primary">
+          <span>+ New Post</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ── Hero ───────────────────────────────────────────────────── -->
+  <section class="hero">
+    <div class="hero-inner">
+      <p class="hero-eyebrow">A space for ideas</p>
+      <h1 class="hero-title">Stories worth<br /><em>reading.</em></h1>
+      <div class="search-bar">
+        <span class="search-icon">⌕</span>
+        <input id="search-input" type="search" placeholder="Search posts…" autocomplete="off" />
+        <span id="search-clear" class="search-clear hidden" role="button" tabindex="0">✕</span>
+      </div>
+      <div class="hero-stats" id="hero-stats">
+        <span id="stat-posts">— posts</span>
+        <span class="stat-dot">·</span>
+        <span id="stat-label">Loading…</span>
+      </div>
+    </div>
+    <div class="hero-decoration" aria-hidden="true">
+      <div class="deco-ring deco-ring-1"></div>
+      <div class="deco-ring deco-ring-2"></div>
+      <div class="deco-ring deco-ring-3"></div>
+    </div>
+  </section>
+
+  <!-- ── Compose Panel ──────────────────────────────────────────── -->
+  <section id="compose-section" class="compose-section hidden">
+    <div class="compose-inner">
+      <div class="compose-header">
+        <h2>Write a Post</h2>
+        <button id="close-compose" class="icon-btn" aria-label="Close">✕</button>
+      </div>
+      <div class="compose-grid">
+        <input  id="post-title"   class="field" type="text"  placeholder="Post title…"            />
+        <input  id="post-author"  class="field" type="text"  placeholder="Your name (optional)…"  />
+        <input  id="post-tags"    class="field" type="text"  placeholder="Tags (comma-separated)…"/>
+        <textarea id="post-content" class="field" rows="6"   placeholder="Write your story here…"></textarea>
+      </div>
+      <div class="compose-footer">
+        <span id="char-count" class="char-count">0 characters</span>
+        <button id="submit-post" class="btn btn-primary">Publish →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Main Content ───────────────────────────────────────────── -->
+  <main class="main-content">
+
+    <!-- Filter bar -->
+    <div class="filter-bar">
+      <div class="filter-label">Filter</div>
+      <div class="filter-chips" id="filter-chips">
+        <button class="chip active" data-filter="all">All</button>
+        <button class="chip" data-filter="today">Today</button>
+        <button class="chip" data-filter="week">This week</button>
+        <button class="chip" data-filter="month">This month</button>
+      </div>
+      <div class="sort-control">
+        <select id="sort-select" aria-label="Sort posts">
+          <option value="newest">Newest first</option>
+          <option value="oldest">Oldest first</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Loading spinner -->
+    <div id="loading" class="loading-state" aria-label="Loading posts">
+      <div class="spinner"></div>
+      <p>Fetching posts…</p>
+    </div>
+
+    <!-- Empty state -->
+    <div id="empty-state" class="empty-state hidden">
+      <div class="empty-icon">✦</div>
+      <h3>No posts yet</h3>
+      <p>Be the first to write something.</p>
+      <button class="btn btn-primary" id="empty-compose-btn">Write a post →</button>
+    </div>
+
+    <!-- Posts grid -->
+    <div id="posts-grid" class="posts-grid" role="feed" aria-label="Blog posts"></div>
+
+    <!-- Pagination -->
+    <div id="pagination" class="pagination hidden">
+      <button id="prev-page" class="btn btn-ghost" disabled>← Previous</button>
+      <span id="page-info"></span>
+      <button id="next-page" class="btn btn-ghost">Next →</button>
+    </div>
+
+  </main>
+
+  <!-- ── Footer ─────────────────────────────────────────────────── -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="logo-text small">✦ Inkwell</span>
+      <span>Built with FastAPI &amp; vanilla JS</span>
+      <span id="footer-year"></span>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
